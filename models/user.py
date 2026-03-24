@@ -16,3 +16,16 @@ class User(db.Model):
 
     def __repr__(self) -> str:
         return f'<User {self.name}>'
+    
+# Getters
+def get_user_by_id(id: int) -> User | None:
+    user: User | None = db.session.execute(db.select(User).where(User.id == id)).scalar_one_or_none()
+    return user
+
+def get_user_by_public_id(public_id: str) -> User | None:
+    user: User | None = db.session.execute(db.select(User).where(User.public_id == public_id)).scalar_one_or_none()
+    return user
+
+def get_user_by_email(email: str) -> User | None:
+    user: User | None = db.session.execute(db.select(User).where(User.email == email)).scalar_one_or_none()
+    return user
