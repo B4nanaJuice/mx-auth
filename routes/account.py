@@ -8,7 +8,7 @@ from extensions.login_manager import login_required
 page: Blueprint = Blueprint(name = 'account', 
                             import_name = __name__, 
                             template_folder = 'templates',
-                            url_prefix = '',
+                            url_prefix = '/account',
                             static_folder = 'static')
 
 @page.route('/me', methods = ['GET'])
