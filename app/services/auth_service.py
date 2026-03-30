@@ -90,7 +90,7 @@ class AuthService:
             raise AuthError(message = 'User not found.', status_code = 404)
         
         if not check_password_hash(user.password, current_password):
-            raise AuthError(message = 'Current password is incorrect.', status_code = 401)
+            raise AuthError(message = 'Password is incorrect.', status_code = 401)
         
         user.password = generate_password_hash(new_password)
         db.session.commit()

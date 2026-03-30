@@ -1,7 +1,7 @@
 # Imports
 from flask import Blueprint, request, flash, redirect, url_for, render_template, Response, make_response, jsonify
 
-from app.forms.auth_forms import RegisterForm, LoginForm
+from app.forms.auth_forms import RegisterForm, LoginForm, PasswordChangeForm
 from app.services.auth_service import AuthService, AuthError
 from app.services.request_service import RequestService
 from app.services.token_service import TokenService
@@ -83,8 +83,26 @@ def refresh():
 @bp.get('/me')
 @login_required
 def me(current_user):
-    print(current_user.username)
-    return jsonify({
-        'access_token': request.cookies.get('access_token'),
-        'refresh_token': request.cookies.get('refresh_token')
-    }), 200
+    password_change_form: PasswordChangeForm = PasswordChangeForm()
+    return render_template('auth/profile.html', user = current_user, form = password_change_form)
+
+# Change password route
+@bp.post('/me/password')
+@login_required
+def change_password(current_user):
+    
+    password_change_form: PasswordChangeForm = PasswordChangeForm()
+    if password_change_form.validate_on_submit():
+        try:
+            AuthService.change_password(
+                user_id = current_user.id,
+                current_password = password_change_form.current_password.data,
+                new_password = password_change_form.new_password.data
+            )
+
+            flash(message = 'Your password has been changed ! All sessions have been invalidated.', category = 'success')
+        
+        except AuthError as e:
+            flash(message = e.message, category = 'error')
+
+    return redirect(url_for('auth.me'))

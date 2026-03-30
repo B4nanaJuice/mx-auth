@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}My profile | MX-Auth{% endblock %}
+{% block header %}
+{% endblock %}
+
+{% block content %}
+    <div class="user-info">
+        <h1>User information</h1>
+        <p>Public ID: @{{ user.public_id }}</p>
+        <p>Username: {{ user.username }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+
+    <form action="{{ url_for('auth.change_password') }}" method="post">
+        {{ form.csrf_token }}
+        {{ form.current_password.label }} {{ form.current_password(size = 20) }}
+        {{ form.new_password.label }} {{ form.new_password(size = 20) }}
+        <input type="submit" value="Change password">
+    </form>
+{% endblock %}

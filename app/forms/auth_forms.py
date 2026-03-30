@@ -47,3 +47,21 @@ class LoginForm(FlaskForm):
         validators = [
             DataRequired(message = 'Password is required')
         ])
+    
+# Change password form
+class PasswordChangeForm(FlaskForm):
+    # Old password, new password
+    current_password: PasswordField = PasswordField(
+        label = 'Current password', 
+        validators = [
+            DataRequired(message = 'Current password is required')
+        ]
+    )
+    new_password: PasswordField = PasswordField(
+        label = 'New password', 
+        validators = [
+            DataRequired(message = 'New password is required'),
+            Length(min = 8, max = 64, message = 'Password must contain between 8 and 64 chars'),
+            Regexp(regex = r'^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^a-zA-Z0-9])([^\s]){8,64}$', message = 'Password must contain at least one lowercase letter, one uppercase letter, one digit and one special char')
+        ]
+    )
