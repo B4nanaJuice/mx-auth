@@ -31,6 +31,7 @@ class BaseConfig:
     # Security
     MAX_LOGIN_ATTEMPTS: int = 5
     LOCKOUT_DURATION_MINUTES: int = 15
+    ALLOWED_REDIRECT_DOMAINS: list[str] = []
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
