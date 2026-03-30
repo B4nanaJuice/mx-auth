@@ -22,11 +22,11 @@ class BaseConfig:
     JWT_ALGORITHM: str = 'HS256'
     JWT_ACCESS_TOKEN_EXPIRES: timedelta = timedelta(seconds = int(os.getenv('JWT_TOKEN_ACCESS_EXPIRES', 15*60)))
     JWT_REFRESH_TOKEN_EXPIRES: timedelta = timedelta(seconds = os.getenv('JWT_REFRESH_TOKEN_EXPIRES', 30*24*60*60))
-    JWT_TOKEN_LOCATION: list = ["headers", "cookies"]
-    JWT_COOKIE_SECURE: bool = False
-    JWT_COOKIE_CSRF_PROTECT: bool = True
-    JWT_BLACKLIST_ENABLED: bool = True
-    JWT_BLACKLIST_TOKEN_CHECKS: list = ["access", "refresh"]
+    # JWT_TOKEN_LOCATION: list = ["headers", "cookies"]
+    # JWT_COOKIE_SECURE: bool = False
+    # JWT_COOKIE_CSRF_PROTECT: bool = True
+    # JWT_BLACKLIST_ENABLED: bool = True
+    # JWT_BLACKLIST_TOKEN_CHECKS: list = ["access", "refresh"]
 
     # Security
     MAX_LOGIN_ATTEMPTS: int = 5
@@ -47,8 +47,8 @@ class TestConfig(BaseConfig):
 class ProductionConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_ECHO = False
-    JWT_COOKIE_SECURE = True
-    JWT_COOKIE_CSRF_PROTECT = True
+    # JWT_COOKIE_SECURE = True
+    # JWT_COOKIE_CSRF_PROTECT = True
 
 _config_map = {
     "development": DevelopmentConfig,

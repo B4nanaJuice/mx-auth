@@ -18,7 +18,7 @@ class TokenService:
     def create_token_pair(user_id: int, additional_claims: dict | None = None) -> dict:
         claims: dict = additional_claims or {}
         
-        access_token: str = jwt.encode({'user_id': user_id, 'exp': datetime.now(timezone.utc) + timedelta(hours = 1)} | claims,
+        access_token: str = jwt.encode({'user_id': user_id, 'exp': datetime.now(timezone.utc) + config.JWT_ACCESS_TOKEN_EXPIRES} | claims,
                                        key = config.JWT_SECRET_KEY,
                                        algorithm = config.JWT_ALGORITHM)
 
