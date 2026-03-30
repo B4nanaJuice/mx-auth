@@ -1,1 +1,0 @@
-from app.core.extensions import db, init_db
