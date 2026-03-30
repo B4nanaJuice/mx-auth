@@ -58,3 +58,5 @@ _config_map = {
 def get_config() -> BaseConfig:
     env = os.getenv('FLASK_ENV', 'development').lower()
     return _config_map.get(env, DevelopmentConfig)
+
+config = get_config()

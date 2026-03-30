@@ -1,8 +1,11 @@
 # Imports
 from flask import Blueprint, request, flash, redirect, url_for, render_template, Response, make_response, jsonify
 
-from app.forms import RegisterForm, LoginForm
-from app.services import AuthService, AuthError
+from app.forms.auth_forms import RegisterForm, LoginForm
+from app.services.auth_service import AuthService, AuthError
+from app.services.request_service import RequestService
+from app.services.token_service import TokenService
+from app.core.extensions import login_required
 
 # Create blueprint
 bp: Blueprint = Blueprint(name = 'auth', import_name = __name__, url_prefix = '/auth')
@@ -42,6 +45,8 @@ def login():
                 ip = request.remote_addr
             )
 
+            next_redirect: str = request.args.get('next', type = str, default = None)
+
             flash(message = 'Successfully logged in !', category = 'success')
             response: Response = make_response(redirect(RequestService.verify_url(next_redirect) if next_redirect else url_for('auth.me')))
             response.set_cookie('access_token', token_pair.get('access_token'))
@@ -53,9 +58,32 @@ def login():
 
     return render_template('auth/login.html', form = login_form)
 
+# Refresh token
+@bp.get('/refresh')
+def refresh():
+
+    access_token: str = request.cookies.get('access_token', type = str, default = None)
+    refresh_token: str = request.cookies.get('refresh_token', type = str, default = None)
+    next_redirect: str = request.args.get('next', type = str, default = None)
+
+    user_id, user_role = TokenService.verify_token_pair(access_token = access_token, refresh_token = refresh_token)
+
+    if user_id == -1:
+        flash(message = 'Something went wrong with your session token. Please login again.', category = 'warning')
+        return redirect(url_for('auth.login'))
+    
+    access_token = TokenService.refresh_access_token(user_id = user_id, user_role = user_role)
+
+    response: Response = make_response(redirect(RequestService.verify_url(next_redirect) if next_redirect else url_for('auth.me')))
+    response.set_cookie('access_token', access_token)
+    return response
+    
+
 # Profile page
 @bp.get('/me')
-def me():
+@login_required
+def me(current_user):
+    print(current_user.username)
     return jsonify({
         'access_token': request.cookies.get('access_token'),
         'refresh_token': request.cookies.get('refresh_token')
