@@ -43,7 +43,7 @@ def login():
             )
 
             flash(message = 'Successfully logged in !', category = 'success')
-            response: Response = make_response(redirect(url_for('auth.me')))
+            response: Response = make_response(redirect(RequestService.verify_url(next_redirect) if next_redirect else url_for('auth.me')))
             response.set_cookie('access_token', token_pair.get('access_token'))
             response.set_cookie('refresh_token', token_pair.get('refresh_token'))
             return response
