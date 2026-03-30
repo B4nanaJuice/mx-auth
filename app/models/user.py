@@ -3,7 +3,7 @@ from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 
-from app.core import db
+from app.data.database import db
 from app.models.token import Token
 
 # Create user model

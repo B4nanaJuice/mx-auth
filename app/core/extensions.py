@@ -1,18 +1,11 @@
 # Imports
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from flask import request, redirect, url_for, flash
+from functools import wraps
+import jwt
 
-# Database
-class Base(DeclarativeBase):
-    pass
+from config.settings import config
+from app.models.user import User
+from app.services.auth_service import AuthService
 
-db: SQLAlchemy = SQLAlchemy(model_class = Base)
 
-def init_db(app: Flask) -> None:
-    db.init_app(app = app)
 
-    with app.app_context():
-        db.create_all()
-
-# Decorators

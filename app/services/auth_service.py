@@ -3,8 +3,8 @@ import logging
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 
-from app.models import User
-from app.core import db
+from app.models.user import User
+from app.data.database import db
 from app.services.token_service import TokenService
 
 logger = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ class AuthService:
         TokenService.revoke_token(encoded_token = refresh_token)
         logger.info(f'User logged out')
 
-        return
+        return 
 
     # Refresh token
     def refresh(user_id: int, user_role: str) -> dict:

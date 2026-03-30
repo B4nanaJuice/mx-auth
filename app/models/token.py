@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core import db
-from config import config
+from app.data.database import db
+from config.settings import config
 
 # Create token class
 class Token(db.Model):
