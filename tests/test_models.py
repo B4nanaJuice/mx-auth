@@ -1,5 +1,6 @@
 # Imports
 from werkzeug.security import generate_password_hash, check_password_hash
+import pytest
 
 from app.data.database import db
 from app.data.models.user import User
