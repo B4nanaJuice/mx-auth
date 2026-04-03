@@ -3,7 +3,6 @@ from flask import Flask, jsonify
 
 from config.settings import config
 from app.data.database import init_db
-from app.blueprints.auth.routes import bp as auth_blueprint
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -14,7 +13,5 @@ def create_app() -> Flask:
     @app.get('/health')
     def get_health():
         return jsonify({'status': 'ok'}), 200
-
-    app.register_blueprint(auth_blueprint)
     
     return app

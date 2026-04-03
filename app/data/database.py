@@ -3,12 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask import Flask
 
-# Database
+# Base
 class Base(DeclarativeBase):
     pass
 
+# Create database connection
 db: SQLAlchemy = SQLAlchemy(model_class = Base)
 
+# Initialize database with the flask app
 def init_db(app: Flask) -> None:
     db.init_app(app = app)
 

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 
 from app.data.database import db
-from app.models.token import Token
+from app.data.models.token import Token
 
 # Create user model
 class User(db.Model):
@@ -39,13 +39,13 @@ class User(db.Model):
             return True
         return False
  
-    def record_login(self, ip: str | None = None):
+    def record_login(self, ip: str | None = None) -> None:
         self.login_attempts = 0
         self.locked_until = None
         self.last_login_at = datetime.now(timezone.utc)
         self.last_login_ip = ip
  
-    def increment_failed_login(self, max_attempts: int = 5, lockout_minutes: int = 15):
+    def increment_failed_login(self, max_attempts: int = 5, lockout_minutes: int = 15) -> None:
         self.login_attempts += 1
         if self.login_attempts >= max_attempts:
             self.locked_until = datetime.now(timezone.utc) + timedelta(minutes = lockout_minutes)
