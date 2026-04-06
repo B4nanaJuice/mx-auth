@@ -28,14 +28,14 @@ class User(db.Model):
     last_login_ip: Mapped[str] = mapped_column(db.String(45), nullable = True)
 
     created_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc), onupdate = datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc), onupdate = lambda: datetime.now(timezone.utc))
  
     # Relationships
     tokens: Mapped[List['Token']] = relationship(cascade = 'all, delete-orphan')
  
     @property
     def is_locked(self) -> bool:
-        if self.locked_until and datetime.fromisoformat(self.locked_until.isoformat() + '+00:00') > datetime.now(timezone.utc):
+        if self.locked_until and self.locked_until.replace(tzinfo = timezone.utc) > datetime.now(timezone.utc):
             return True
         return False
  
@@ -49,11 +49,11 @@ class User(db.Model):
         self.login_attempts += 1
         if self.login_attempts >= max_attempts:
             self.locked_until = datetime.now(timezone.utc) + timedelta(minutes = lockout_minutes)
-            self.login_attempts = 0
  
     def to_dict(self) -> dict:
         return {
             'id': self.id,
+            'public_id': self.public_id,
             'username': self.username,
             'email': self.email,
             'role': self.role,
