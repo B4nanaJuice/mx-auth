@@ -19,16 +19,16 @@ class Token(db.Model):
 
     @property
     def is_valid(self) -> bool:
-        return datetime.now(timezone.utc) < self.expires_at
+        return datetime.now(timezone.utc) < self.expires_at.replace(tzinfo = timezone.utc)
     
-    # def to_dict(self) -> dict:
-    #     return {
-    #         'id': self.id,
-    #         'value': self.value,
-    #         'owner_id': self.owner_id,
-    #         'created_at': self.created_at.isoformat(),
-    #         'expires_at': self.expires_at.isoformat(),
-    #     }
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'value': self.value,
+            'owner_id': self.owner_id,
+            'created_at': self.created_at.isoformat(),
+            'expires_at': self.expires_at.isoformat(),
+        }
     
     def __repr__(self) -> str:
         return f'<Token {self.value[:10]}...>'
