@@ -1,7 +1,6 @@
 # Imports
 from flask import Flask
-from werkzeug.security import generate_password_hash, check_password_hash
-import pytest
+from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta, timezone
 
 from app.data.database import db
