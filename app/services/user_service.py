@@ -1,5 +1,10 @@
 # Imports
+import logging
+
 from app.data.models.user import User
+
+# Create logger
+logger = logging.getLogger(__name__)
 
 # Create custom exception class
 class UserException(Exception):
@@ -34,3 +39,10 @@ class UserService:
         if not user:
             raise UserException(f'User not found with email {email}')
         return user
+    
+    # Get user by identifier
+    @staticmethod
+    def get_user_by_identifier(identifier: str) -> User:
+        user: User = User.query.filter((User.public_id == identifier)|(User.email == identifier)).first()
+        if not user:
+            raise UserException(f'User not found with email or public_id {identifier}')
