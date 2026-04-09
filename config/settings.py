@@ -23,6 +23,7 @@ class BaseConfig:
     JWT_ALGORITHM: str = 'HS256'
     JWT_ACCESS_TOKEN_EXPIRES: timedelta = timedelta(seconds = int(os.getenv('ACCESS_TOKEN_EXPIRES', 15 * 60)))
     JWT_REFRESH_TOKEN_EXPIRES: timedelta = timedelta(seconds = int(os.getenv('REFRESH_TOKEN_EXPIRES', 30 * 24 * 60 * 60)))
+    JWT_REFRESH_TOKEN_SIZE: int = 48
 
     # Security
     MAX_LOGIN_ATTEMPTS: int = 5
