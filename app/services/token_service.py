@@ -1,7 +1,7 @@
 # Imports
 import jwt
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import os
 
 from app.data.database import db
