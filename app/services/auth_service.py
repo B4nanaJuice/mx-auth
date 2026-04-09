@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.data.database import db
 from app.services.token_service import TokenService
-from app.services.user_service import UserService
+from app.services.user_service import UserService, UserException
 from app.data.models.user import User
 
 # Create logger
@@ -35,7 +35,7 @@ class AuthService:
 
         try:
             db.session.commit()
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             existing: User | None = User.query.filter((User.public_id == public_id.lower().strip())|(User.email == email.lower().strip())).first()
 
@@ -54,7 +54,7 @@ class AuthService:
     
     # Verify user account
     @staticmethod
-    def verify(public_id: str) -> None:
+    def verify_user(public_id: str) -> None:
         user: User = UserService.get_user_by_public_id(public_id = public_id)
         
         user.is_verified = True
@@ -66,9 +66,10 @@ class AuthService:
     @staticmethod
     def login(identifier: str, password: str, ip: str | None = None) -> dict[str, str]:
         identifier: str = identifier.strip().lower()
-        user: User = User.query.filter((User.public_id == identifier)|(User.email == identifier)).first()
 
-        if not user:
+        try:
+            user: User = UserService.get_user_by_identifier(identifier = identifier)
+        except UserException:
             raise AuthException('Invalid creadentials.', 401)
         
         if not user.is_active:
@@ -85,6 +86,31 @@ class AuthService:
         user.record_login(ip = ip)
         db.session.commit()
 
-        token_pair: dict[str, str] = {}
+        token_pair: dict[str, str] = TokenService.create_token_pair(user_id = user.id)
         logger.info(f'User logged in: @{user.public_id} (ip = {ip})')
         return token_pair
+    
+    # Logout
+    @staticmethod
+    def logout(refresh_token: str) -> None:
+        
+        TokenService.revoke_token(refresh_token = refresh_token)
+        return
+
+    # Change password
+    @staticmethod
+    def change_password(user_id: int, current_password: str, new_password: str) -> None:
+        
+        try:
+            user: User = UserService.get_user_by_id(id = user_id)
+        except UserException:
+            raise AuthException('Invalid credentials.')
+        
+        if not user or not check_password_hash(user.password, current_password):
+            raise AuthException('Invalid credentials.')
+        
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+
+        TokenService.revoke_all_tokens(user_id = user_id)
+        return
