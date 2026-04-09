@@ -27,7 +27,7 @@ class UserService:
     # Get user from its id
     @staticmethod
     def get_user_by_id(id: int) -> User:
-        user: User | None = User.query.get(id)
+        user: User | None = User.query.filter(User.id == id).first()
         if not user:
             raise UserException(f'User not found with the ID {id}')
         return user
@@ -46,3 +46,4 @@ class UserService:
         user: User = User.query.filter((User.public_id == identifier)|(User.email == identifier)).first()
         if not user:
             raise UserException(f'User not found with email or public_id {identifier}')
+        return user
