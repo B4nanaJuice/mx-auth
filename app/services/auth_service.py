@@ -3,7 +3,7 @@ import logging
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.data.database import db
-from app.services.token_service import TokenService
+from app.services.token_service import TokenService, TokenPair
 from app.services.user_service import UserService, UserException
 from app.data.models.user import User
 
@@ -56,6 +56,9 @@ class AuthService:
     @staticmethod
     def verify_user(public_id: str) -> None:
         user: User = UserService.get_user_by_public_id(public_id = public_id)
+
+        if user.is_verified:
+            raise AuthException(f'User {public_id} is already verified.')
         
         user.is_verified = True
         db.session.commit()
@@ -64,7 +67,7 @@ class AuthService:
     
     # Login the user
     @staticmethod
-    def login(identifier: str, password: str, ip: str | None = None) -> dict[str, str]:
+    def login(identifier: str, password: str, ip: str | None = None) -> TokenPair:
         identifier: str = identifier.strip().lower()
 
         try:
@@ -75,7 +78,10 @@ class AuthService:
         if not user.is_active:
             raise AuthException('This account is not activated yet. Please activate it before login again.', 403)
         
-        if not user.is_locked:
+        if not user.is_verified:
+            raise AuthException('This account has not been verified yet.', 401)
+        
+        if user.is_locked:
             raise AuthException('This account is locked temporarily due to too many failed attempts. Please try again later.', 403)
         
         if not check_password_hash(pwhash = user.password, password = password):
@@ -86,7 +92,7 @@ class AuthService:
         user.record_login(ip = ip)
         db.session.commit()
 
-        token_pair: dict[str, str] = TokenService.create_token_pair(user_id = user.id)
+        token_pair: TokenPair = TokenService.create_token_pair(user_id = user.id)
         logger.info(f'User logged in: @{user.public_id} (ip = {ip})')
         return token_pair
     
@@ -108,6 +114,9 @@ class AuthService:
         
         if not user or not check_password_hash(user.password, current_password):
             raise AuthException('Invalid credentials.')
+        
+        if current_password == new_password:
+            raise AuthException('Your new password must be different from your current one.')
         
         user.password = generate_password_hash(new_password)
         db.session.commit()
