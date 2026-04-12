@@ -169,3 +169,5 @@ class TokenService:
         db.session.commit()
 
         logger.info(f'Purged {count} expired token{"s" if count != 1 else ""}')
+        
+        return count
