@@ -5,6 +5,8 @@ from config.settings import config
 from app.data.database import init_db
 from app.cli import register_commands
 
+from app.routes.auth import bp
+
 def create_app() -> Flask:
     app = Flask(__name__)
 
@@ -15,5 +17,7 @@ def create_app() -> Flask:
     @app.get('/health')
     def get_health():
         return jsonify({'status': 'ok'}), 200
+    
+    app.register_blueprint(bp)
     
     return app
