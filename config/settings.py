@@ -32,8 +32,9 @@ class BaseConfig:
 
 # Development config from base config class
 class DevelopmentConfig(BaseConfig):
-    DEBUG = True
-    SQLALCHEMY_ECHO = True
+    # DEBUG = True
+    # SQLALCHEMY_ECHO = True
+    pass
 
 # Test config from base config class
 class TestConfig(BaseConfig):
