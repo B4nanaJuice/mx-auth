@@ -1,16 +1,24 @@
 # Imports
-from flask import url_for
 import logging
 import re
+import jwt
 
 from config.settings import config
 
+# Create logger
 logger = logging.getLogger(__name__)
 
-class RequestService:
+# Create custom exception class
+class RequestException(Exception):
+    def __init__(self, message: str, status_code: int = 400):
+        super().__init__(message)
+        self.message: str = message
+        self.status_code: int = status_code
 
-    # Verify url (protection)
+# Create static class
+class RequestService:
+    
+    # Check if redirect url is in allowed redirects
     @staticmethod
-    def verify_url(url: str) -> str:
-        default_url: str = url_for('auth.login')
-        return url
+    def is_allowed_redirect(next_url: str) -> bool:
+        return True

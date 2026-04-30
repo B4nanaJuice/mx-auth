@@ -1,22 +1,13 @@
 <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock %} | MX-Auth</title>
         {% block header %}
         {% endblock %}
     </head>
     <body>
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <div class="notifications">
-                    {% for message in messages %}
-                        {{ message }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
         <div class="content">
             {% block content %}
             {% endblock %}

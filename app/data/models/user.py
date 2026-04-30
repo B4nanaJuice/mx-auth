@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List
 
 from app.data.database import db
-from app.models.token import Token
+from app.data.models.token import Token
 
 # Create user model
 class User(db.Model):
@@ -20,6 +20,7 @@ class User(db.Model):
 
     is_active: Mapped[bool] = mapped_column(nullable = False, default = True)
     is_verified: Mapped[bool] = mapped_column(nullable = False, default = False)
+    verify_token: Mapped[str] = mapped_column(nullable = True)
 
     # Login tracking
     login_attempts: Mapped[int] = mapped_column(nullable = False, default = 0)
@@ -28,32 +29,32 @@ class User(db.Model):
     last_login_ip: Mapped[str] = mapped_column(db.String(45), nullable = True)
 
     created_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc), onupdate = datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc), onupdate = lambda: datetime.now(timezone.utc))
  
     # Relationships
     tokens: Mapped[List['Token']] = relationship(cascade = 'all, delete-orphan')
  
     @property
     def is_locked(self) -> bool:
-        if self.locked_until and datetime.fromisoformat(self.locked_until.isoformat() + '+00:00') > datetime.now(timezone.utc):
+        if self.locked_until and self.locked_until.replace(tzinfo = timezone.utc) > datetime.now(timezone.utc):
             return True
         return False
  
-    def record_login(self, ip: str | None = None):
+    def record_login(self, ip: str | None = None) -> None:
         self.login_attempts = 0
         self.locked_until = None
         self.last_login_at = datetime.now(timezone.utc)
         self.last_login_ip = ip
  
-    def increment_failed_login(self, max_attempts: int = 5, lockout_minutes: int = 15):
+    def increment_failed_login(self, max_attempts: int = 5, lockout_minutes: int = 15) -> None:
         self.login_attempts += 1
         if self.login_attempts >= max_attempts:
             self.locked_until = datetime.now(timezone.utc) + timedelta(minutes = lockout_minutes)
-            self.login_attempts = 0
  
     def to_dict(self) -> dict:
         return {
             'id': self.id,
+            'public_id': self.public_id,
             'username': self.username,
             'email': self.email,
             'role': self.role,
