@@ -1,6 +1,7 @@
 # Imports
 import logging
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 from app.data.database import db
 from app.services.token_service import TokenService, TokenPair
@@ -28,7 +29,8 @@ class AuthService:
             public_id = public_id.lower().strip(),
             username = username.strip(),
             email = email.lower().strip(),
-            password = password_hash
+            password = password_hash,
+            verify_token = os.urandom(32).hex()
         )
 
         db.session.add(user)
@@ -54,13 +56,14 @@ class AuthService:
     
     # Verify user account
     @staticmethod
-    def verify_user(public_id: str) -> None:
-        user: User = UserService.get_user_by_public_id(public_id = public_id)
+    def verify_user(verify_token: str) -> None:
+        user: User = UserService.get_user_by_verify_token(verify_token = verify_token)
 
         if user.is_verified:
-            raise AuthException(f'User {public_id} is already verified.')
+            raise AuthException(f'User {user.public_id} is already verified.')
         
         user.is_verified = True
+        user.verify_token = None
         db.session.commit()
 
         return

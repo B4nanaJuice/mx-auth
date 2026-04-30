@@ -47,3 +47,11 @@ class UserService:
         if not user:
             raise UserException(f'User not found with email or public_id {identifier}')
         return user
+    
+    # Get user by its verify token
+    @staticmethod
+    def get_user_by_verify_token(verify_token: str) -> User:
+        user: User = User.query.filter(User.verify_token == verify_token).first()
+        if not user:
+            raise UserException(f'User not found with verify token {verify_token}')
+        return user
