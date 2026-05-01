@@ -43,3 +43,20 @@ class LoginForm(FlaskForm):
         validators = [DataRequired()],
         description = 'Enter your password.'
     )
+
+class ChangePasswordForm(FlaskForm):
+    pass
+
+class RequestPasswordResetForm(FlaskForm):
+    identifier: StringField = StringField(
+        label = 'Public ID or Email',
+        validators = [DataRequired()],
+        description = 'Enter your public ID (begins with @) or your email address.'
+    )
+
+class ResetPasswordForm(FlaskForm):
+    password: PasswordField = PasswordField(
+        label = 'New password',
+        validators = [DataRequired(), Regexp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$')],
+        description = 'Enter your new password here. It must contain at least 8 characters, one lowercase letter, one uppercase letter, one digit and one special character.'
+    )

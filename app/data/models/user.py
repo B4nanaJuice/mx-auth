@@ -21,6 +21,7 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(nullable = False, default = True)
     is_verified: Mapped[bool] = mapped_column(nullable = False, default = False)
     verify_token: Mapped[str] = mapped_column(nullable = True)
+    reset_password_token: Mapped[str] = mapped_column(nullable = True)
 
     # Login tracking
     login_attempts: Mapped[int] = mapped_column(nullable = False, default = 0)

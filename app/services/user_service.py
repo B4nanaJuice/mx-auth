@@ -55,3 +55,11 @@ class UserService:
         if not user:
             raise UserException(f'User not found with verify token {verify_token}')
         return user
+    
+    # Get user by its reset password token
+    @staticmethod
+    def get_user_by_reset_password_token(reset_password_token: str) -> User:
+        user: User = User.query.filter(User.reset_password_token == reset_password_token).first()
+        if not user:
+            raise UserException(f'User not found with reset password token {reset_password_token}')
+        return user

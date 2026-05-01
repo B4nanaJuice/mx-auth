@@ -6,6 +6,7 @@ import os
 from app.data.database import db
 from app.services.token_service import TokenService, TokenPair
 from app.services.user_service import UserService, UserException
+from app.services.mail_service import MailService, MailException
 from app.data.models.user import User
 
 # Create logger
@@ -125,4 +126,38 @@ class AuthService:
         db.session.commit()
 
         TokenService.revoke_all_tokens(user_id = user_id)
+        return
+    
+    # Request password reset
+    @staticmethod
+    def request_password_reset(identifier: str) -> str:
+
+        user: User = None
+
+        try:
+            user = UserService.get_user_by_identifier(identifier = identifier)
+        except:
+            pass
+
+        if user:
+            user.reset_password_token = os.urandom(32).hex()
+            db.session.commit()
+
+            return user.reset_password_token
+        return None
+    
+    # Reset password
+    @staticmethod
+    def reset_password(reset_password_token: str, new_password: str) -> None:
+        
+        try:
+            user: User = UserService.get_user_by_reset_password_token(reset_password_token = reset_password_token)
+        except UserException:
+            raise AuthException('Invalid token.')
+        
+        user.password = generate_password_hash(new_password)
+        user.reset_password_token = None
+        db.session.commit()
+
+        TokenService.revoke_all_tokens(user_id = user.id)
         return

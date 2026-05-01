@@ -1,7 +1,7 @@
 # Imports
 from flask import Flask, Blueprint, render_template, flash, request, redirect, url_for
 
-from app.forms.auth import RegisterForm, LoginForm
+from app.forms.auth import RegisterForm, LoginForm, ChangePasswordForm, ResetPasswordForm, RequestPasswordResetForm
 from app.services import AuthService, AuthException, UserException
 
 # Create blueprint
@@ -70,3 +70,48 @@ def login():
             return render_template('auth/login.html', form = login_form)
         
     return render_template('auth/login.html', form = login_form)
+
+@bp.route('/request-password-reset', methods = ['GET', 'POST'])
+def request_password_reset():
+
+    request_password_reset_form: RequestPasswordResetForm = RequestPasswordResetForm()
+    if request_password_reset_form.validate_on_submit():
+
+        try:
+            token: str = AuthService.request_password_reset(
+                identifier = request_password_reset_form.identifier.data
+            )
+
+            if not token:
+                return redirect(url_for('auth.login'))
+
+            print(url_for('auth.reset_password', token = token))
+            return f'A link has been sent to your email if it is in the database.'
+        
+        except AuthException as e:
+            flash(e.message, 'error')
+            return redirect(url_for('auth.login'))
+        
+    return render_template('auth/request_password_reset.html', form = request_password_reset_form)
+        
+
+@bp.route('/reset-password', methods = ['GET', 'POST'])
+def reset_password():
+
+    reset_password_token: str = request.args.get('token', None)
+    reset_password_form: ResetPasswordForm = ResetPasswordForm()
+    if reset_password_form.validate_on_submit():
+
+        try:
+            AuthService.reset_password(
+                reset_password_token = reset_password_token,
+                new_password = reset_password_form.password.data
+            )
+
+            return f'Password changed, you can now login with the new password'
+        
+        except AuthException as e:
+            flash(e.message, 'error')
+            return redirect(url_for('auth.login'))
+    
+    return render_template('auth/reset_password.html', form = reset_password_form)
