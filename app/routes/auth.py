@@ -1,8 +1,10 @@
 # Imports
-from flask import Flask, Blueprint, render_template, flash, request, redirect, url_for
+from flask import Flask, Blueprint, render_template, flash, request, redirect, url_for, make_response, Response
 
 from app.forms.auth import RegisterForm, LoginForm, ChangePasswordForm, ResetPasswordForm, RequestPasswordResetForm
 from app.services import AuthService, AuthException, UserException
+from app.decorators import access_token_required, refresh_token_required
+from app.data.models.user import User
 
 # Create blueprint
 bp: Blueprint = Blueprint('auth', 'auth', url_prefix = '/auth')
@@ -63,7 +65,10 @@ def login():
                 password = login_form.password.data
             )
 
-            return f'access: {token_pair.access_token}, refresh: {token_pair.refresh_token}'
+            response: Response = make_response(redirect(url_for('auth.me')))
+            response.set_cookie('access_token', token_pair.access_token)
+            response.set_cookie('refresh_token', token_pair.refresh_token)
+            return response
         
         except AuthException as e:
             flash(e.message, 'error')
@@ -115,3 +120,13 @@ def reset_password():
             return redirect(url_for('auth.login'))
     
     return render_template('auth/reset_password.html', form = reset_password_form)
+
+@bp.get('/me')
+@access_token_required
+def me(user: User):
+    return user.username
+
+@bp.get('/refresh-token')
+@refresh_token_required
+def refresh_token(refresh_token: str):
+    return "refresh_token"
