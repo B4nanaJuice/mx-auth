@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+    <h1>Welcome {{ user.username }} !</h1>
+
+    <h1>Change your password :</h1>
+    <form method="post" action="{{ url_for('auth.change_password') }}">
+        {{ form.hidden_tag() }}
+        {{ form.current_password() }}
+        {{ form.new_password() }}
+
+        <input type="submit" value="Change password">
+    </form>
+
+{% endblock %}

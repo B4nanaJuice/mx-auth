@@ -124,7 +124,30 @@ def reset_password():
 @bp.get('/me')
 @access_token_required
 def me(user: User):
-    return user.username
+
+    change_password_form: ChangePasswordForm = ChangePasswordForm()
+    return render_template('auth/me.html', user = user, form = change_password_form)
+
+@bp.post('/change-password')
+@access_token_required
+def change_password(user: User):
+
+    change_password_form: ChangePasswordForm = ChangePasswordForm()
+    if change_password_form.validate_on_submit():
+        
+        try:
+            AuthService.change_password(
+                user_id = user.id,
+                current_password = change_password_form.current_password.data,
+                new_password = change_password_form.new_password.data
+            )
+
+            flash('Your password has been changed successfully !', 'success')
+        
+        except AuthException as e:
+            flash(e.message, 'error')
+
+    return redirect(url_for('auth.me'))
 
 @bp.get('/refresh-token')
 @refresh_token_required
