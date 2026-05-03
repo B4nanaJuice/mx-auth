@@ -2,7 +2,7 @@
 from flask import Flask, Blueprint, render_template, flash, request, redirect, url_for, make_response, Response
 
 from app.forms.auth import RegisterForm, LoginForm, ChangePasswordForm, ResetPasswordForm, RequestPasswordResetForm
-from app.services import AuthService, AuthException, UserException
+from app.services import AuthService, AuthException, UserException, TokenService, TokenException
 from app.decorators import access_token_required, refresh_token_required
 from app.data.models.user import User
 
@@ -152,4 +152,19 @@ def change_password(user: User):
 @bp.get('/refresh-token')
 @refresh_token_required
 def refresh_token(refresh_token: str):
-    return "refresh_token"
+
+    try:
+
+        token_pair = TokenService.refresh_access_token(
+            refresh_token = refresh_token
+        )
+
+        next: str = request.args.get('next', None)
+        response: Response = make_response(redirect(next if next else url_for('auth.me')))
+        response.set_cookie('access_token', token_pair.access_token)
+        response.set_cookie('refresh_token', token_pair.refresh_token)
+        return response
+    
+    except TokenException as e:
+        flash(e.message, 'error')
+        return redirect(url_for('auth.login'))
