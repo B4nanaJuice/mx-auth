@@ -169,3 +169,16 @@ def refresh_token(refresh_token: str):
     except TokenException as e:
         flash(e.message, 'error')
         return redirect(url_for('auth.login'))
+    
+@bp.get('/logout')
+@refresh_token_required
+def logout(refresh_token: str):
+    AuthService.logout(
+        refresh_token = refresh_token
+    )
+
+    flash('You have been successfully disconnected from your session')
+    response: Response = make_response(redirect(url_for('auth.login')))
+    response.set_cookie('access_token', '', expires = 0)
+    response.set_cookie('refresh_token', '', expires = 0)
+    return response
