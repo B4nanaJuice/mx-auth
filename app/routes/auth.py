@@ -113,7 +113,8 @@ def reset_password():
                 new_password = reset_password_form.password.data
             )
 
-            return f'Password changed, you can now login with the new password'
+            flash('Your password has been changed. You can now login with the new password.')
+            return redirect(url_for('auth.login'))
         
         except AuthException as e:
             flash(e.message, 'error')

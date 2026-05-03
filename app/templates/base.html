@@ -1,3 +1,5 @@
+{% from "components/flashed_messages.html" import flashed_messages %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,6 +10,9 @@
         {% endblock %}
     </head>
     <body>
+
+        {{ flashed_messages() }}
+
         <div class="content">
             {% block content %}
             {% endblock %}
