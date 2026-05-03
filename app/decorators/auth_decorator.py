@@ -35,7 +35,6 @@ def refresh_token_required(f):
     def _f(*args, **kwargs):
 
         refresh_token: str = request.cookies.get('refresh_token', None)
-        print(refresh_token)
         if refresh_token:
             return f(refresh_token, *args, **kwargs)
         return redirect(url_for('auth.login', next = request.url))

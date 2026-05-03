@@ -77,7 +77,7 @@ class AuthService:
         try:
             user: User = UserService.get_user_by_identifier(identifier = identifier)
         except UserException:
-            raise AuthException('Invalid creadentials.', 401)
+            raise AuthException('Invalid credentials.', 401)
         
         if not user.is_active:
             raise AuthException('This account is not activated yet. Please activate it before login again.', 403)
