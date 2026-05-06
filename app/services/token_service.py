@@ -7,6 +7,7 @@ import os
 from app.data.database import db
 from app.data.models.token import Token
 from config.settings import config
+from app.services.app_service import AppException, AppService
 
 # Create logger
 logger = logging.getLogger(__name__)
@@ -92,7 +93,7 @@ class TokenService:
 
     # Refresh access token
     @staticmethod
-    def refresh_access_token(refresh_token: str) -> TokenPair:
+    def refresh_access_token(refresh_token: str, external_app: str = None) -> TokenPair:
         
         refresh_token_data: dict = jwt.decode(
             jwt = refresh_token,
@@ -107,10 +108,19 @@ class TokenService:
         if not token:
             raise TokenException(f'No user corresponds to this token.')
         
+        jwt_key: str = config.JWT_ACCESS_TOKEN_SECRET_KEY
+        
+        if external_app:
+            try:
+                app = AppService.get_app_by_name(name = external_app)
+                jwt_key = app.access_token_secret
+            except AppException as e:
+                raise TokenException(e.message)
+        
         user_id: int = token.owner_id
         access_token: str = jwt.encode(
             { 'user_id': user_id, 'exp': datetime.now(timezone.utc) + config.JWT_ACCESS_TOKEN_EXPIRES },
-            key = config.JWT_ACCESS_TOKEN_SECRET_KEY,
+            key = jwt_key,
             algorithm = config.JWT_ALGORITHM
         )
 
