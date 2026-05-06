@@ -1,0 +1,26 @@
+# Imports
+import os
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.data.database import db
+
+# Create token class
+class ExternalApp(db.Model):
+    __tablename__ = 'apps'
+
+    # Attributes
+    id: Mapped[int] = mapped_column(primary_key = True, autoincrement = True)
+    name: Mapped[str] = mapped_column(db.String(64), nullable = False, unique = True)
+    url: Mapped[str] = mapped_column(db.String(64), nullable = False)
+    secret_key: Mapped[str] = mapped_column(db.String(64), nullable = False, default = lambda: os.urandom(32).hex())
+
+    
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'url': self.url
+        }
+    
+    def __repr__(self) -> str:
+        return f'<ExternalApp {self.name}>'

@@ -157,7 +157,8 @@ def refresh_token(refresh_token: str):
     try:
 
         token_pair = TokenService.refresh_access_token(
-            refresh_token = refresh_token
+            refresh_token = refresh_token,
+            external_app = request.args.get('app', None)
         )
 
         next: str = request.args.get('next', None)

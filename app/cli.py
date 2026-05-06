@@ -7,6 +7,8 @@ from app.data.database import db
 from app.data.models.user import User
 from app.services.auth_service import AuthService
 from app.services.token_service import TokenService
+from app.data.models.app import ExternalApp
+from app.services import AppService
 
 # Method to register custom commands
 def register_commands(app: Flask):
@@ -18,6 +20,8 @@ def register_commands(app: Flask):
 @click.command('seed-db')
 @with_appcontext
 def seed_db():
+
+    click.echo('Starting to add users')
     
     try:
         admin: User = AuthService.register(
@@ -41,6 +45,17 @@ def seed_db():
     except:
         click.echo('User already exists.')
 
+    click.echo('Adding external app')
+
+    try:
+        app: ExternalApp = AppService.register_external_app(
+            name = 'test',
+            url = 'localhost:6543'
+        )
+        click.echo(f'App {app.name} has been created')
+    except:
+        click.echo('App already exists.')
+        
     return
 
 # Method to purge tokens
