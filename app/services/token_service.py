@@ -7,8 +7,8 @@ import os
 from app.data.database import db
 from app.data.models.token import Token
 from config.settings import config
-from app.data.models.app import ExternalApp
-from app.services.app_service import AppService, AppException
+from app.data.models.oauth import OAuthClient
+from app.services.oauth_service import OAuthService, OAuthException
 
 # Create logger
 logger = logging.getLogger(__name__)
@@ -113,9 +113,9 @@ class TokenService:
         
         if external_app:
             try:
-                app: ExternalApp = AppService.get_app_by_name(name = external_app)
+                app: OAuthClient = OAuthService.get_app_by_name(name = external_app)
                 jwt_key = app.secret_key
-            except AppException as e:
+            except OAuthException as e:
                 raise TokenException(e.message)
         
         user_id: int = token.owner_id

@@ -29,6 +29,7 @@ class BaseConfig:
     MAX_LOGIN_ATTEMPTS: int = 5
     LOCKOUT_DURATION_MINUTES: int = 15
     ALLOWED_REDIRECT_DOMAINS: list[str] = []
+    AUTHORIZATION_CODE_EXPIRES: timedelta = timedelta(minutes = 5)
 
 # Development config from base config class
 class DevelopmentConfig(BaseConfig):

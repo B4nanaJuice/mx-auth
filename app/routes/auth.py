@@ -3,12 +3,13 @@ import os
 from flask import Flask, Blueprint, render_template, flash, request, redirect, url_for, make_response, Response, jsonify
 
 from app.forms.auth import RegisterForm, LoginForm, ChangePasswordForm, ResetPasswordForm, RequestPasswordResetForm
-from app.services import AuthService, AuthException, UserException, TokenService, TokenException
+from app.services import AuthService, AuthException, UserException, TokenService, TokenException, OAuthService, OAuthException
 from app.decorators import access_token_required, refresh_token_required
 from app.data.models.user import User
 
 # Create blueprint
 bp: Blueprint = Blueprint('auth', 'auth', url_prefix = '/auth')
+pending_auth: dict[str, dict] = {}
 
 @bp.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -185,39 +186,3 @@ def logout(refresh_token: str):
     response.set_cookie('access_token', '', expires = 0)
     response.set_cookie('refresh_token', '', expires = 0)
     return response
-
-@bp.get('/authorize')
-@refresh_token_required
-def authorize(refresh_token: str):
-
-    # Generate authorization code
-    authorization_code: str = os.urandom(4).hex()
-
-    # Redirect on external app callback url with the filled code
-    next: str = request.args.get('next', None)
-    if not next:
-        flash('Something went wrong. There was no given callback url for this action.')
-        redirect(url_for('auth.me'))
-
-    return redirect(f'{next}?code={authorization_code}')
-
-@bp.post('/exchange')
-def exchange():
-
-    # Get authorization code
-    authorization_code: str = request.get('code', None)
-    if not authorization_code:
-        return jsonify({}, 400)
-
-    # Find pending request
-    pending: str = ''
-    if not pending:
-        return jsonify({}, 400)
-
-    # Get refresh token and generate access token
-
-    # Return tokens in jsonify
-    return jsonify({
-        'access_token': '',
-        'refresh_token': ''
-    }, 200)

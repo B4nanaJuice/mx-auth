@@ -7,7 +7,7 @@ from app.data.database import db
 from app.data.models.user import User
 from app.services.auth_service import AuthService
 from app.services.token_service import TokenService
-from app.data.models.app import ExternalApp
+from app.data.models.oauth import ExternalApp
 from app.services import AppService
 
 # Method to register custom commands
