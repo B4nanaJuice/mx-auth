@@ -11,7 +11,8 @@ class OAuthClient(db.Model):
     id: Mapped[str] = mapped_column(db.String(16), primary_key = True)
     name: Mapped[str] = mapped_column(db.String(32), nullable = False, unique = True)
     redirect_uri: Mapped[str] = mapped_column(db.String(64), nullable = False, unique = True)
-    secret: Mapped[str] = mapped_column(db.String(96), nullable = False, unique = True, default = lambda: os.urandom(48).hex())
+    access_secret: Mapped[str] = mapped_column(db.String(96), nullable = False, unique = True, default = lambda: os.urandom(48).hex())
+    refresh_secret: Mapped[str] = mapped_column(db.String(96), nullable = False, unique = True, default = lambda: os.urandom(48).hex())
 
     def to_dict(self) -> dict:
         return {

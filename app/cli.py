@@ -7,6 +7,7 @@ from app.data.database import db
 from app.data.models.user import User
 from app.services.auth_service import AuthService
 from app.services.token_service import TokenService
+from app.services.oauth_service import OAuthService
 
 # Method to register custom commands
 def register_commands(app: Flask):
@@ -18,6 +19,12 @@ def register_commands(app: Flask):
 @click.command('seed-db')
 @with_appcontext
 def seed_db():
+
+    OAuthService.create_oauth_client(
+        id = 'test',
+        name = 'Test',
+        redirect_uri = 'localhost:1234'
+    )
     
     try:
         admin: User = AuthService.register(

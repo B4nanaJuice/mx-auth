@@ -29,18 +29,23 @@ class TokenService:
     
     # Create token pair
     @staticmethod
-    def create_token_pair(user_id: int) -> TokenPair:
+    def create_token_pair(user_id: int, 
+                          access_secret: str | None = config.JWT_ACCESS_TOKEN_SECRET_KEY, 
+                          refresh_secret: str | None = config.JWT_REFRESH_TOKEN_SECRET_KEY,
+                          oauth_client_id: str | None = None
+                        ) -> TokenPair:
         
         access_token: str = jwt.encode(
             { 'user_id': user_id, 'exp': datetime.now(timezone.utc) + config.JWT_ACCESS_TOKEN_EXPIRES },
-            key = config.JWT_ACCESS_TOKEN_SECRET_KEY,
+            key = access_secret,
             algorithm = config.JWT_ALGORITHM
         )
 
         refresh_token_value: str = os.urandom(config.JWT_REFRESH_TOKEN_SIZE).hex()
         token: Token = Token(
             value = refresh_token_value,
-            owner_id = user_id
+            owner_id = user_id,
+            oauth_client_id = oauth_client_id
         )
 
         db.session.add(token)
@@ -48,7 +53,7 @@ class TokenService:
 
         refresh_token: str = jwt.encode(
             { 'value': refresh_token_value },
-            key = config.JWT_REFRESH_TOKEN_SECRET_KEY,
+            key = refresh_secret,
             algorithm = config.JWT_ALGORITHM
         )
 

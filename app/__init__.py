@@ -5,7 +5,8 @@ from config.settings import config
 from app.data.database import init_db
 from app.cli import register_commands
 
-from app.routes.auth import bp
+from app.routes.auth import bp as auth_bp
+from app.routes.oauth import bp as oauth_bp
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -18,6 +19,7 @@ def create_app() -> Flask:
     def get_health():
         return jsonify({'status': 'ok'}), 200
     
-    app.register_blueprint(bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(oauth_bp)
     
     return app

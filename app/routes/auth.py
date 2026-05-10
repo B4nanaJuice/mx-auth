@@ -52,7 +52,6 @@ def verify():
     flash('Your accont has been verified ! You can now login.', 'success')
     return redirect(url_for('auth.login'))
     
-
 @bp.route('/login', methods = ['GET', 'POST'])
 def login():
 
@@ -65,7 +64,8 @@ def login():
                 password = login_form.password.data
             )
 
-            response: Response = make_response(redirect(url_for('auth.me')))
+            next: str = request.args.get('next', None)
+            response: Response = make_response(redirect(next if next else url_for('auth.me')))
             response.set_cookie('access_token', token_pair.access_token)
             response.set_cookie('refresh_token', token_pair.refresh_token)
             return response
@@ -98,7 +98,6 @@ def request_password_reset():
             return redirect(url_for('auth.login'))
         
     return render_template('auth/request_password_reset.html', form = request_password_reset_form)
-        
 
 @bp.route('/reset-password', methods = ['GET', 'POST'])
 def reset_password():

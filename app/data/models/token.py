@@ -14,7 +14,7 @@ class Token(db.Model):
     id: Mapped[int] = mapped_column(primary_key = True, autoincrement = True)
     value: Mapped[str] = mapped_column(db.String(64), unique = True, index = True)
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    oauth_client_id: Mapped[str] = mapped_column(ForeignKey('oauth_clients.id'))
+    oauth_client_id: Mapped[str] = mapped_column(ForeignKey('oauth_clients.id'), nullable = True)
     created_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc))
     expires_at: Mapped[datetime] = mapped_column(nullable = False, default = lambda: datetime.now(timezone.utc) + config.JWT_REFRESH_TOKEN_EXPIRES)
 
